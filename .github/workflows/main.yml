@@ -1,9 +1,21 @@
-sudo: required
-services:
-  - docker
+name: CI
 
-before_install:
-  - docker build -t dimkko/frontend -f Dockerfile.dev .
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
-script:
-  - docker run -e CI=true dimkko/frontend npm run test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t dimkko/frontend -f Dockerfile.dev .
+
+      - name: Run tests inside container
+        run: docker run -e CI=true dimkko/frontend npm run test
